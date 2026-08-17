@@ -1,0 +1,19 @@
+# Dependencies and generated builds
+node_modules/
+dist/
+
+# Vercel and local tooling
+.vercel/
+.wrangler/
+
+# Environment files and logs
+.env
+.env.*
+!.env.example
+*.log
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
