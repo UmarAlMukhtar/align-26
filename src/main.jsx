@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
-import { motion, MotionConfig } from 'motion/react'
+import { AnimatePresence, motion, MotionConfig } from 'motion/react'
 import { ArrowUpRight, Instagram, Linkedin, Plus, X } from 'lucide-react'
 import './styles.css'
 import './footer.css'
@@ -229,13 +229,23 @@ function App() {
 }
 
 function Card({n,title,children}) {
-  return <motion.article className="card" {...reveal} whileHover={{y:-7, transition:{duration:.35, ease}}}><small>{n}</small><h3>{title}</h3><p>{children}</p></motion.article>
+  return <motion.article className="card" {...reveal}><small>{n}</small><h3>{title}</h3><p>{children}</p></motion.article>
 }
 function Stat({value,label}) {
-  return <motion.div className="stat" {...reveal} whileHover={{y:-5, transition:{duration:.3, ease}}}><b>{value}</b><span>{label}</span></motion.div>
+  return <motion.div className="stat" {...reveal}><b>{value}</b><span>{label}</span></motion.div>
 }
 function Faq({q,children}) {
-  return <motion.details {...reveal}><summary>{q}<span>+</span></summary><p>{children}</p></motion.details>
+  const [open, setOpen] = useState(false)
+  return <motion.div className={`faqItem${open ? ' isOpen' : ''}`} {...reveal}>
+    <button className="faqQuestion" type="button" onClick={() => setOpen(value => !value)} aria-expanded={open}>
+      <span>{q}</span><span className="faqPlus" aria-hidden="true">+</span>
+    </button>
+    <AnimatePresence initial={false}>
+      {open && <motion.div className="faqAnswer" initial={{height:0, opacity:0}} animate={{height:'auto', opacity:1}} exit={{height:0, opacity:0}} transition={{height:{duration:.45, ease}, opacity:{duration:.28, ease}}}>
+        <p>{children}</p>
+      </motion.div>}
+    </AnimatePresence>
+  </motion.div>
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>)
