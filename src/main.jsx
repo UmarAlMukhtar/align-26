@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
-import { motion } from 'motion/react'
+import { motion, MotionConfig } from 'motion/react'
 import { ArrowUpRight, Instagram, Linkedin, Plus, X } from 'lucide-react'
 import './styles.css'
 import './footer.css'
+import './motion.css'
 
 const ease = [0.16, 1, 0.3, 1]
+const reveal = { initial: { opacity: 0, y: 28, filter: 'blur(8px)' }, whileInView: { opacity: 1, y: 0, filter: 'blur(0px)' }, viewport: { once: true, amount: 0.18 }, transition: { duration: .85, ease } }
 const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=LBS+College+of+Engineering%2C+Povval%2C+Kasaragod%2C+Kerala+671542'
 const mapsEmbedUrl = 'https://www.google.com/maps?q=LBS%20College%20of%20Engineering%2C%20Povval%2C%20Kasaragod%2C%20Kerala%20671542&z=15&output=embed'
 
@@ -30,7 +32,7 @@ function App() {
   ]
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <style>{`.menuButton{border:0;cursor:pointer;font-family:inherit}.menuPanel{position:fixed;z-index:45;top:72px;left:16px;width:min(360px,calc(100vw - 32px));background:#050505;color:#fff;border-radius:22px;box-shadow:0 22px 60px rgba(0,0,0,.24);padding:18px}.menuPanelInner{display:flex;flex-direction:column;gap:18px}.menuLabel{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#888}.menuLinks{display:grid;gap:3px}.menuLinks a{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #242424;font-size:18px;font-weight:400;letter-spacing:-.025em;text-decoration:none}.menuLinks a span{font-size:14px;color:#aaa}.menuNotice{font-size:12px;color:#aaa;line-height:1.45}@media(min-width:768px){.menuPanel{top:84px;left:32px;width:390px}}`}</style>
       <motion.nav initial={{y:-16, opacity:0}} animate={{y:0, opacity:1}} transition={{duration:.8, ease}}>
         <div className="cluster">
@@ -98,10 +100,10 @@ function App() {
             <h2 className="sectionTitle">One day. Multiple ways to move forward.</h2>
             <div className="program">
               {timeline.map(([time,title,text]) => (
-                <div className="row" key={time+title}>
+                <motion.div className="row" key={time+title} {...reveal}>
                   <div className="time">{time}</div>
                   <div><h3>{title}</h3><p>{text}</p></div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -199,8 +201,8 @@ function App() {
 
       <footer className="siteFooter">
         <div className="shell">
-          <div className="footerIntro"><span className="footerLabel">Stay connected</span><h2>Where academia and<br/>industry align.</h2></div>
-          <div className="footerGrid">
+          <motion.div className="footerIntro" {...reveal}><span className="footerLabel">Stay connected</span><h2>Where academia and<br/>industry align.</h2></motion.div>
+          <motion.div className="footerGrid" {...reveal} transition={{duration:.9, delay:.08, ease}}>
             <div className="footerBrand">
               <a className="footerLogo" href="#top" aria-label="ALIGN 2026 home"><LogoMark/><strong>ALIGN ’26</strong></a>
               <a className="iasLogoLink" href="https://ieeeiaslbscek.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="IEEE Industry Applications Society LBSCEK website">
@@ -218,22 +220,22 @@ function App() {
               <a href="https://www.linkedin.com/showcase/ieee-ias-lbscek/" target="_blank" rel="noopener noreferrer"><Linkedin size={18}/><span>LinkedIn</span><ArrowUpRight size={16}/></a>
               <a href="https://ieeeiaslbscek.vercel.app/" target="_blank" rel="noopener noreferrer"><span className="webGlyph">www</span><span>Chapter website</span><ArrowUpRight size={16}/></a>
             </div>
-          </div>
-          <div className="footerBottom"><span>© 2026 IEEE IAS SBC LBSCEK</span><span>19 September 2026 · Kasaragod, Kerala</span><a href="#top">Back to top ↑</a></div>
+          </motion.div>
+          <motion.div className="footerBottom" {...reveal} transition={{duration:.8, delay:.12, ease}}><span>© 2026 IEEE IAS SBC LBSCEK</span><span>19 September 2026 · Kasaragod, Kerala</span><a href="#top">Back to top ↑</a></motion.div>
         </div>
       </footer>
-    </>
+    </MotionConfig>
   )
 }
 
 function Card({n,title,children}) {
-  return <article className="card"><small>{n}</small><h3>{title}</h3><p>{children}</p></article>
+  return <motion.article className="card" {...reveal} whileHover={{y:-7, transition:{duration:.35, ease}}}><small>{n}</small><h3>{title}</h3><p>{children}</p></motion.article>
 }
 function Stat({value,label}) {
-  return <div className="stat"><b>{value}</b><span>{label}</span></div>
+  return <motion.div className="stat" {...reveal} whileHover={{y:-5, transition:{duration:.3, ease}}}><b>{value}</b><span>{label}</span></motion.div>
 }
 function Faq({q,children}) {
-  return <details><summary>{q}<span>+</span></summary><p>{children}</p></details>
+  return <motion.details {...reveal}><summary>{q}<span>+</span></summary><p>{children}</p></motion.details>
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>)
