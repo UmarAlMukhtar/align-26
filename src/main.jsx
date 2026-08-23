@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { motion } from 'motion/react'
-import { Plus, X } from 'lucide-react'
+import { ArrowUpRight, Instagram, Linkedin, Plus, X } from 'lucide-react'
 import './styles.css'
+import './footer.css'
 
 const ease = [0.16, 1, 0.3, 1]
 const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=LBS+College+of+Engineering%2C+Povval%2C+Kasaragod%2C+Kerala+671542'
@@ -21,10 +22,6 @@ function LogoMark() {
   return <span className="logoMark"><i /><i /></span>
 }
 
-function DotGrid() {
-  return <span className="dotGrid"><span/><span/><span/><span/></span>
-}
-
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const navigation = [
@@ -34,7 +31,7 @@ function App() {
 
   return (
     <>
-      <style>{`.menuButton{border:0;cursor:pointer;font-family:inherit}.menuPanel{position:fixed;z-index:45;top:72px;left:16px;width:min(360px,calc(100vw - 32px));background:#050505;color:#fff;border-radius:22px;box-shadow:0 22px 60px rgba(0,0,0,.24);padding:18px}.menuPanelInner{display:flex;flex-direction:column;gap:18px}.menuLabel,.footerLabel{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#888}.menuLinks{display:grid;gap:3px}.menuLinks a{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #242424;font-size:18px;font-weight:400;letter-spacing:-.025em;text-decoration:none}.menuLinks a span{font-size:14px;color:#aaa}.menuNotice{font-size:12px;color:#aaa;line-height:1.45}.footerEnhanced{align-items:flex-start}.footerBrand,.footerNav,.footerStatus{display:flex;flex-direction:column;gap:10px}.footerBrand .logo{width:max-content}.footerBrand strong,.footerStatus strong{font-size:13px}.footerNav{min-width:160px}.footerLinks{display:grid;grid-template-columns:repeat(2,max-content);gap:9px 18px}.footerStatus{align-items:flex-start}.footerTop{margin-top:6px;font-size:12px;text-decoration:none;border-bottom:1px solid #999;padding-bottom:2px}@media(min-width:768px){.menuPanel{top:84px;left:32px;width:390px}.footerEnhanced{display:grid;grid-template-columns:1.35fr 1fr .8fr;gap:32px}.footerGrid.footerEnhanced{align-items:start}}`}</style>
+      <style>{`.menuButton{border:0;cursor:pointer;font-family:inherit}.menuPanel{position:fixed;z-index:45;top:72px;left:16px;width:min(360px,calc(100vw - 32px));background:#050505;color:#fff;border-radius:22px;box-shadow:0 22px 60px rgba(0,0,0,.24);padding:18px}.menuPanelInner{display:flex;flex-direction:column;gap:18px}.menuLabel{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#888}.menuLinks{display:grid;gap:3px}.menuLinks a{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #242424;font-size:18px;font-weight:400;letter-spacing:-.025em;text-decoration:none}.menuLinks a span{font-size:14px;color:#aaa}.menuNotice{font-size:12px;color:#aaa;line-height:1.45}@media(min-width:768px){.menuPanel{top:84px;left:32px;width:390px}}`}</style>
       <motion.nav initial={{y:-16, opacity:0}} animate={{y:0, opacity:1}} transition={{duration:.8, ease}}>
         <div className="cluster">
           <a className="logo" href="#top"><LogoMark/><span className="brand">ALIGN ’26</span></a>
@@ -43,7 +40,9 @@ function App() {
           </button>
           <div className="pill desktopOnly"><span>Industry Connect</span><span>Technical Workshop</span></div>
         </div>
-        <div className="pill desktopOnly"><span className="circle black"><DotGrid/></span><span>IEEE IAS · LBSCEK</span></div>
+        <a className="iasHeaderLogo desktopOnly" href="https://ieeeiaslbscek.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="IEEE Industry Applications Society LBSCEK website">
+          <img src="/ieee-ias-primary-logo.png" alt="IEEE Industry Applications Society" width="1875" height="521" />
+        </a>
       </motion.nav>
 
       {menuOpen && <motion.div id="site-menu" className="menuPanel" initial={{opacity:0, y:-10}} animate={{opacity:1, y:0}} transition={{duration:.25, ease}}>
@@ -199,21 +198,28 @@ function App() {
       </main>
 
       <footer className="siteFooter">
-        <div className="shell footerGrid footerEnhanced">
-          <div className="footerBrand">
-            <a className="logo" href="#top"><LogoMark/><strong>ALIGN ’26</strong></a>
-            <div className="muted">IEEE IAS Student Branch Chapter<br/>LBS College of Engineering, Kasaragod</div>
+        <div className="shell">
+          <div className="footerIntro"><span className="footerLabel">Stay connected</span><h2>Where academia and<br/>industry align.</h2></div>
+          <div className="footerGrid">
+            <div className="footerBrand">
+              <a className="footerLogo" href="#top" aria-label="ALIGN 2026 home"><LogoMark/><strong>ALIGN ’26</strong></a>
+              <a className="iasLogoLink" href="https://ieeeiaslbscek.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="IEEE Industry Applications Society LBSCEK website">
+                <img className="iasLogo" src="/ieee-ias-primary-logo-white.png" alt="IEEE Industry Applications Society" width="1875" height="521" loading="lazy" />
+              </a>
+              <p>Organised by IEEE Industry Applications Society Student Branch Chapter, LBS College of Engineering, Kasaragod.</p>
+            </div>
+            <nav className="footerNav" aria-label="Footer navigation">
+              <span className="footerLabel">Explore</span>
+              <a href="#about">About</a><a href="#program">Program</a><a href="#workshop">Workshop</a><a href="#why-attend">Why Attend</a><a href="#venue">Venue</a><a href="#faq">FAQ</a>
+            </nav>
+            <div className="footerSocial">
+              <span className="footerLabel">Follow IEEE IAS LBSCEK</span>
+              <a href="https://www.instagram.com/ieee.ias.lbscek" target="_blank" rel="noopener noreferrer"><Instagram size={18}/><span>Instagram</span><ArrowUpRight size={16}/></a>
+              <a href="https://www.linkedin.com/showcase/ieee-ias-lbscek/" target="_blank" rel="noopener noreferrer"><Linkedin size={18}/><span>LinkedIn</span><ArrowUpRight size={16}/></a>
+              <a href="https://ieeeiaslbscek.vercel.app/" target="_blank" rel="noopener noreferrer"><span className="webGlyph">www</span><span>Chapter website</span><ArrowUpRight size={16}/></a>
+            </div>
           </div>
-          <div className="footerNav">
-            <span className="footerLabel">Explore</span>
-            <div className="footerLinks"><a href="#about">About</a><a href="#program">Program</a><a href="#workshop">Workshop</a><a href="#why-attend">Why Attend</a><a href="#venue">Venue</a><a href="#faq">FAQ</a></div>
-          </div>
-          <div className="footerStatus">
-            <span className="footerLabel">Registration</span>
-            <strong>Coming soon</strong>
-            <span className="muted">19 September 2026</span>
-            <a className="footerTop" href="#top">Back to top ↑</a>
-          </div>
+          <div className="footerBottom"><span>© 2026 IEEE IAS SBC LBSCEK</span><span>19 September 2026 · Kasaragod, Kerala</span><a href="#top">Back to top ↑</a></div>
         </div>
       </footer>
     </>
