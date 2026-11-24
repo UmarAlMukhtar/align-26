@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom/client'
-import { AnimatePresence, motion, MotionConfig } from 'motion/react'
+import { AnimatePresence, motion, MotionConfig, useReducedMotion } from 'motion/react'
 import { ArrowUpRight, Instagram, Linkedin, Plus, X } from 'lucide-react'
 import './styles.css'
 import './footer.css'
@@ -9,7 +9,7 @@ import './motion.css'
 const ease = [0.16, 1, 0.3, 1]
 const reveal = { initial: { opacity: 0, y: 28, filter: 'blur(8px)' }, whileInView: { opacity: 1, y: 0, filter: 'blur(0px)' }, viewport: { once: true, amount: 0.18 }, transition: { duration: .85, ease } }
 const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=LBS+College+of+Engineering%2C+Povval%2C+Kasaragod%2C+Kerala+671542'
-const mapsEmbedUrl = 'https://www.google.com/maps?q=LBS%20College%20of%20Engineering%2C%20Povval%2C%20Kasaragod%2C%20Kerala%20671542&z=15&output=embed'
+const mapsEmbedUrl = 'https://www.openstreetmap.org/export/embed.html?bbox=75.073%2C12.499%2C75.088%2C12.508&layer=mapnik&marker=12.50358%2C75.08078'
 
 const timeline = [
   ['09:30', 'Registration & Reporting', 'Participant arrival, reporting and attendance.'],
@@ -26,6 +26,30 @@ function LogoMark() {
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const reduceMotion = useReducedMotion()
+  const [overDarkSection, setOverDarkSection] = useState(false)
+  const headerLogo = useRef(null)
+
+  useEffect(() => {
+    const darkSections = [...document.querySelectorAll('.darkSection, .siteFooter')]
+    const updateLogoContrast = () => {
+      const logo = headerLogo.current.getBoundingClientRect()
+      const midpoint = logo.top + logo.height / 2
+      setOverDarkSection(darkSections.some(section => {
+        const { top, bottom } = section.getBoundingClientRect()
+        return top <= midpoint && midpoint < bottom
+      }))
+    }
+
+    updateLogoContrast()
+    window.addEventListener('scroll', updateLogoContrast, { passive: true })
+    window.addEventListener('resize', updateLogoContrast)
+    return () => {
+      window.removeEventListener('scroll', updateLogoContrast)
+      window.removeEventListener('resize', updateLogoContrast)
+    }
+  }, [])
+
   const navigation = [
     ['About', '#about'], ['Program', '#program'], ['Workshop', '#workshop'],
     ['Why Attend', '#why-attend'], ['Venue', '#venue'], ['FAQ', '#faq'],
@@ -33,27 +57,62 @@ function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <style>{`.menuButton{border:0;cursor:pointer;font-family:inherit}.menuPanel{position:fixed;z-index:45;top:72px;left:16px;width:min(360px,calc(100vw - 32px));background:#050505;color:#fff;border-radius:22px;box-shadow:0 22px 60px rgba(0,0,0,.24);padding:18px}.menuPanelInner{display:flex;flex-direction:column;gap:18px}.menuLabel{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#888}.menuLinks{display:grid;gap:3px}.menuLinks a{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #242424;font-size:18px;font-weight:400;letter-spacing:-.025em;text-decoration:none}.menuLinks a span{font-size:14px;color:#aaa}.menuNotice{font-size:12px;color:#aaa;line-height:1.45}@media(min-width:768px){.menuPanel{top:84px;left:32px;width:390px}}`}</style>
+      <style>{`.menuButton{border:0;cursor:pointer;font-family:inherit}.menuPanel{position:fixed;z-index:45;top:72px;right:16px;width:min(360px,calc(100vw - 32px));background:#050505;color:#fff;border-radius:22px;box-shadow:0 22px 60px rgba(0,0,0,.24);padding:18px}.menuPanelInner{display:flex;flex-direction:column;gap:18px}.menuLabel{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#888}.menuLinks{display:grid;gap:3px}.menuLinks a{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #242424;font-size:18px;font-weight:400;letter-spacing:-.025em;text-decoration:none}.menuLinks a span{font-size:14px;color:#aaa}.menuNotice{font-size:12px;color:#aaa;line-height:1.45}@media(min-width:768px){.menuPanel{top:84px;right:32px;width:390px}}`}</style>
       <motion.nav initial={{y:-16, opacity:0}} animate={{y:0, opacity:1}} transition={{duration:.8, ease}}>
         <div className="cluster">
-          <a className="logo" href="#top"><LogoMark/><span className="brand">ALIGN ’26</span></a>
-          <button className="pill dark menuButton" type="button" onClick={() => setMenuOpen(open => !open)} aria-expanded={menuOpen} aria-controls="site-menu">
-            <span className="circle">{menuOpen ? <X size={13} strokeWidth={3}/> : <Plus size={12} strokeWidth={3}/>}</span><span>{menuOpen ? 'Close' : 'Menu'}</span>
-          </button>
+          <a ref={headerLogo} className={overDarkSection ? 'logo logoOnDark' : 'logo'} href="#top" aria-label="ALIGN ’26 home"><LogoMark/><span className="brand">ALIGN ’26</span></a>
           <div className="pill desktopOnly"><span>Industry Connect</span><span>Technical Workshop</span></div>
         </div>
-        <a className="iasHeaderLogo desktopOnly" href="https://ieeeiaslbscek.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="IEEE Industry Applications Society LBSCEK website">
-          <img src="/ieee-ias-primary-logo.png" alt="IEEE Industry Applications Society" width="1875" height="521" />
-        </a>
+        <div className="cluster">
+          <a className="iasHeaderLogo desktopOnly" href="https://ieeeiaslbscek.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="IEEE Industry Applications Society LBSCEK website">
+            <img src="/ieee-ias-primary-logo.png" alt="IEEE Industry Applications Society" width="1875" height="521" />
+          </a>
+          <motion.button
+            className="pill dark menuButton"
+            type="button"
+            onClick={() => setMenuOpen(open => !open)}
+            aria-expanded={menuOpen}
+            aria-controls="site-menu"
+            whileTap={{ scale: 0.94 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 22 }}
+          >
+            <motion.span
+              className="circle"
+              aria-hidden="true"
+              animate={{ rotate: menuOpen && !reduceMotion ? 45 : 0 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 21 }}
+            >
+              {menuOpen && reduceMotion ? <X size={12} strokeWidth={3} /> : <Plus size={12} strokeWidth={3} />}
+            </motion.span>
+            <span>{menuOpen ? 'Close' : 'Menu'}</span>
+          </motion.button>
+        </div>
       </motion.nav>
 
-      {menuOpen && <motion.div id="site-menu" className="menuPanel" initial={{opacity:0, y:-10}} animate={{opacity:1, y:0}} transition={{duration:.25, ease}}>
-        <div className="menuPanelInner">
-          <span className="menuLabel">Navigate</span>
-          <div className="menuLinks">{navigation.map(([label, href]) => <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}<span>↗</span></a>)}</div>
-          <div className="menuNotice">Registration details coming soon.</div>
-        </div>
-      </motion.div>}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            id="site-menu"
+            className="menuPanel"
+            style={{ transformOrigin: 'top right' }}
+            initial={{ opacity: 0, scale: 0.85, y: -8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.85, y: -8, transition: { duration: 0.18, ease } }}
+            transition={{
+              type: 'spring',
+              stiffness: 380,
+              damping: 21,
+              opacity: { duration: 0.16 },
+            }}
+          >
+            <div className="menuPanelInner">
+              <span className="menuLabel">Navigate</span>
+              <div className="menuLinks">{navigation.map(([label, href]) => <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}<span>↗</span></a>)}</div>
+              <div className="menuNotice">Registration details coming soon.</div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <main>
         <section className="hero" id="top">
@@ -62,42 +121,31 @@ function App() {
             <div className="veil"/>
           </motion.div>
 
-          <motion.section className="heroFooter" initial={{y:20, opacity:0}} animate={{y:0, opacity:1}} transition={{delay:.5,duration:1,ease}}>
+          <div className="heroFooter">
             <div className="footGrid">
               <div>
-                <motion.div className="eyebrow" initial={{y:16, opacity:0}} animate={{y:0, opacity:1}} transition={{delay:.6,duration:.8,ease}}>
-                  <span className="dot"/><span>19 September 2026 · LBS College of Engineering, Kasaragod</span>
-                </motion.div>
-                <motion.h1 initial={{y:20, opacity:0}} animate={{y:0, opacity:1}} transition={{delay:.8,duration:.8,ease}}>
-                  Academia meets<br/>Industry. For real.
-                </motion.h1>
-                <motion.div className="buttons" initial={{y:16, opacity:0}} animate={{y:0, opacity:1}} transition={{delay:1,duration:.8,ease}}>
-                  <span className="btn primary disabled" aria-disabled="true">Registration coming soon</span>
-                  <a className="btn secondary" href="#program">Explore Program</a>
-                </motion.div>
+                <h1>ALIGN ’26</h1>
+                <p className="heroDescription">IEEE IAS Industry–Academia Connect</p>
+                <p className="eventDate"><time dateTime="2026-12-18">Friday, 18 December 2026</time> · LBS College of Engineering, Kasaragod</p>
+                <div className="buttons">
+                  <a className="btn primary" href="#program">View the program</a>
+                  <span className="registrationStatus">Registration hasn’t opened yet.</span>
+                </div>
               </div>
-              <div className="tags"><span className="tag">Industry Panel</span><span className="tag">Hands-on Workshop</span><span className="tag">Technical Quiz</span></div>
             </div>
-          </motion.section>
+          </div>
         </section>
 
         <section className="content" id="about">
           <div className="shell">
-            <div className="sectionKicker">About ALIGN ’26</div>
-            <h2 className="sectionTitle">Bridging the gap between campus and industry.</h2>
-            <p className="lead">ALIGN ’26 brings students, faculty, startup founders and industry professionals into one space to explore emerging technology, career pathways and the expectations of modern engineering practice.</p>
-            <div className="grid3">
-              <Card n="01" title="Industry Insights">Hear directly from professionals working across power, automation, manufacturing, renewable energy and modern industrial systems.</Card>
-              <Card n="02" title="Emerging Technology">Explore robotics, embedded systems, industrial IoT, automation, additive manufacturing and related technologies.</Card>
-              <Card n="03" title="Future-Focused Learning">Explore new ideas with founders, professionals, mentors and fellow students through focused sessions and discussion.</Card>
-            </div>
+            <h2 className="sectionTitle">About ALIGN ’26</h2>
+            <p className="lead">The IEEE Industry Applications Society Student Branch Chapter at LBSCEK is bringing students and faculty together with engineers and startup founders for an industry panel, a hands-on workshop and an individual technical quiz.</p>
           </div>
         </section>
 
         <section className="content" id="program">
           <div className="shell">
-            <div className="sectionKicker">Program</div>
-            <h2 className="sectionTitle">One day. Multiple ways to move forward.</h2>
+            <h2 className="sectionTitle">Event schedule</h2>
             <div className="program">
               {timeline.map(([time,title,text]) => (
                 <motion.div className="row" key={time+title} {...reveal}>
@@ -111,57 +159,42 @@ function App() {
 
         <section className="content darkSection">
           <div className="shell">
-            <div className="sectionKicker">Featured panel</div>
-            <h2 className="sectionTitle">Three perspectives. One conversation.</h2>
-            <p className="lead">A structured discussion designed to connect what students learn, what industries need and where technology is heading.</p>
+            <h2 className="sectionTitle">Industry panel</h2>
+            <p className="lead">How does an engineering degree prepare students for their first industry role? The panel brings together an industry professional, a startup founder and a faculty moderator.</p>
             <div className="grid3">
-              <Card n="Industry" title="Corporate Industry Leader">A senior professional from power systems, industrial automation, manufacturing, renewable energy or electrical infrastructure.</Card>
-              <Card n="Startups" title="Startup Founder">An entrepreneur working in robotics, automation, embedded systems, Industrial IoT, additive manufacturing or clean technologies.</Card>
-              <Card n="Academia" title="Academic Moderator">A senior faculty member connecting industry expectations with learning, research opportunities and student development.</Card>
+              <Card title="Industry professional">Perspective from power systems, automation, manufacturing, renewable energy or electrical infrastructure.</Card>
+              <Card title="Startup founder">Perspective from building products in robotics, automation, embedded systems, industrial IoT, additive manufacturing or clean technology.</Card>
+              <Card title="Faculty moderator">A senior faculty member will connect the discussion to engineering curricula and research opportunities.</Card>
             </div>
           </div>
         </section>
 
         <section className="content darkSection" id="workshop">
           <div className="shell">
-            <div className="sectionKicker">Technical workshop</div>
-            <h2 className="sectionTitle">Learn by building, not just listening.</h2>
-            <p className="lead">An expert-led practical session intended to expose participants to emerging industrial technology.</p>
+            <h2 className="sectionTitle">Hands-on technical workshop</h2>
+            <p className="lead">The workshop will cover an applied engineering topic. Possible topics include:</p>
             <div className="chips">
-              {['Robotics','Industrial Automation','Embedded Systems','Industrial IoT','Additive Manufacturing','Emerging Industrial Tech'].map(x=><span className="chip" key={x}>{x}</span>)}
+              {['Robotics','Industrial Automation','Embedded Systems','Industrial IoT','Additive Manufacturing'].map(x=><span className="chip" key={x}>{x}</span>)}
             </div>
-            <div className="buttons"><span className="btn light disabled" aria-disabled="true">Registration coming soon</span></div>
           </div>
         </section>
 
         <section className="content" id="why-attend">
           <div className="shell">
-            <div className="sectionKicker">Why attend</div>
-            <h2 className="sectionTitle">More than a campus event.</h2>
+            <h2 className="sectionTitle">Why attend</h2>
             <div className="grid3">
-              <Card n="Exposure" title="Industry Exposure">See how technical concepts are applied beyond the classroom.</Card>
-              <Card n="Careers" title="Career Insights">Understand what modern engineering roles and employers expect.</Card>
-              <Card n="Practice" title="Hands-on Learning">Gain practical exposure through a guided technical workshop.</Card>
-              <Card n="People" title="Expert Perspectives">Learn from founders, professionals and academics working across modern engineering domains.</Card>
-              <Card n="Next steps" title="Future Opportunities">Discover pathways toward internships, research, entrepreneurship and collaboration.</Card>
-              <Card n="Community" title="IEEE Connections">Explore technical communities, professional development and future industry engagement.</Card>
-            </div>
-            <div className="stats">
-              <Stat value="200+" label="Expected participants"/>
-              <Stat value="7 hrs" label="Full-day experience"/>
-              <Stat value="3" label="Industry × Startup × Academia"/>
-              <Stat value="1 day" label="Learning & opportunity"/>
+              <Card title="Engineering careers">Hear how engineers apply classroom concepts at work and what employers look for in graduates.</Card>
+              <Card title="Further study and projects">Discuss internships, research and starting a company with people working in those areas.</Card>
+              <Card title="IEEE community">Meet other students and learn about the IEEE IAS chapter at LBSCEK.</Card>
             </div>
           </div>
         </section>
 
         <section className="content" id="venue">
           <div className="shell">
-            <div className="sectionKicker">Venue</div>
-            <h2 className="sectionTitle">Meet us at LBSCEK.</h2>
+            <h2 className="sectionTitle">Venue</h2>
             <div className="venue">
               <div className="card">
-                <small>Location</small>
                 <h3>Amphitheater</h3>
                 <p>LBS College of Engineering<br/>Kasaragod, Kerala</p>
                 <div className="buttons"><a className="btn primary" href={mapsUrl} target="_blank" rel="noreferrer">Get Directions</a></div>
@@ -173,35 +206,22 @@ function App() {
 
         <section className="content" id="faq">
           <div className="shell">
-            <div className="sectionKicker">FAQ</div>
-            <h2 className="sectionTitle">Before you register.</h2>
+            <h2 className="sectionTitle">Frequently asked questions</h2>
             <div className="faq">
               <Faq q="Who can participate?">Undergraduate and M.Tech students, IEEE and non-IEEE students, faculty members, industry professionals and other interested participants.</Faq>
-              <Faq q="Is the event limited to IEEE members?">No. The proposed participation includes both IEEE and non-IEEE students.</Faq>
+              <Faq q="Is the event limited to IEEE members?">No. Students can attend without an IEEE membership.</Faq>
               <Faq q="Is food provided?">Yes. Lunch and refreshments are planned for registered participants.</Faq>
               <Faq q="Does the event include a workshop?">Yes. The program includes a hands-on technical workshop focused on emerging IEEE IAS-related technologies.</Faq>
-              <Faq q="When will registration open?">Registration details will be announced soon. Please check back for the external registration link.</Faq>
-              <Faq q="Will certificates be provided?">Certificate details have not been specified in the current proposal and should be added only after confirmation from the organizers.</Faq>
+              <Faq q="When will registration open?">The organizers haven’t announced a registration date.</Faq>
+              <Faq q="Will certificates be provided?">The organizers haven’t confirmed whether certificates will be available.</Faq>
             </div>
           </div>
         </section>
 
-        <section className="cta">
-          <div className="shell">
-            <div className="ctaBox">
-              <div className="sectionKicker">ALIGN ’26</div>
-              <h2>Connect with industry. Build beyond the classroom.</h2>
-              <p>Join students, professionals, founders and academics for a full day of technology and practical learning.</p>
-              <div className="buttons"><span className="btn light disabled" aria-disabled="true">Registration coming soon</span></div>
-              <p className="muted">19 September 2026 · LBS College of Engineering, Kasaragod</p>
-            </div>
-          </div>
-        </section>
       </main>
 
       <footer className="siteFooter">
         <div className="shell">
-          <motion.div className="footerIntro" {...reveal}><span className="footerLabel">Stay connected</span><h2>Where academia and<br/>industry align.</h2></motion.div>
           <motion.div className="footerGrid" {...reveal} transition={{duration:.9, delay:.08, ease}}>
             <div className="footerBrand">
               <a className="footerLogo" href="#top" aria-label="ALIGN 2026 home"><LogoMark/><strong>ALIGN ’26</strong></a>
@@ -221,18 +241,15 @@ function App() {
               <a href="https://ieeeiaslbscek.vercel.app/" target="_blank" rel="noopener noreferrer"><span className="webGlyph">www</span><span>Chapter website</span><ArrowUpRight size={16}/></a>
             </div>
           </motion.div>
-          <motion.div className="footerBottom" {...reveal} transition={{duration:.8, delay:.12, ease}}><span>© 2026 IEEE IAS SBC LBSCEK</span><span>19 September 2026 · Kasaragod, Kerala</span><a href="#top">Back to top ↑</a></motion.div>
+          <motion.div className="footerBottom" {...reveal} transition={{duration:.8, delay:.12, ease}}><span>© 2026 IEEE IAS SBC LBSCEK</span><span>18 December 2026 · Kasaragod, Kerala</span><a href="#top">Back to top ↑</a></motion.div>
         </div>
       </footer>
     </MotionConfig>
   )
 }
 
-function Card({n,title,children}) {
-  return <motion.article className="card" {...reveal}><small>{n}</small><h3>{title}</h3><p>{children}</p></motion.article>
-}
-function Stat({value,label}) {
-  return <motion.div className="stat" {...reveal}><b>{value}</b><span>{label}</span></motion.div>
+function Card({title,children}) {
+  return <motion.article className="card" {...reveal}><h3>{title}</h3><p>{children}</p></motion.article>
 }
 function Faq({q,children}) {
   const [open, setOpen] = useState(false)
