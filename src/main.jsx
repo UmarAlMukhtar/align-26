@@ -31,22 +31,35 @@ function App() {
   const headerLogo = useRef(null)
 
   useEffect(() => {
-    const darkSections = [...document.querySelectorAll('.darkSection, .siteFooter')]
-    const updateLogoContrast = () => {
-      const logo = headerLogo.current.getBoundingClientRect()
-      const midpoint = logo.top + logo.height / 2
-      setOverDarkSection(darkSections.some(section => {
-        const { top, bottom } = section.getBoundingClientRect()
-        return top <= midpoint && midpoint < bottom
-      }))
+    const darkSections = document.querySelectorAll('.darkSection, .siteFooter')
+    let observer
+
+    const observeLogoBackground = () => {
+      observer?.disconnect()
+      const logo = headerLogo.current
+      const midpoint = Math.floor(logo.offsetTop + logo.offsetHeight / 2)
+      const bottomInset = Math.max(0, document.documentElement.clientHeight - midpoint - 1)
+      const sectionsBehindLogo = new Set()
+
+      observer = new IntersectionObserver(entries => {
+        for (const { target, isIntersecting } of entries) {
+          if (isIntersecting) sectionsBehindLogo.add(target)
+          else sectionsBehindLogo.delete(target)
+        }
+        setOverDarkSection(sectionsBehindLogo.size > 0)
+      }, {
+        // Narrow the viewport to a one-pixel strip through the fixed logo.
+        rootMargin: `-${midpoint}px 0px -${bottomInset}px 0px`,
+      })
+
+      darkSections.forEach(section => observer.observe(section))
     }
 
-    updateLogoContrast()
-    window.addEventListener('scroll', updateLogoContrast, { passive: true })
-    window.addEventListener('resize', updateLogoContrast)
+    observeLogoBackground()
+    window.addEventListener('resize', observeLogoBackground)
     return () => {
-      window.removeEventListener('scroll', updateLogoContrast)
-      window.removeEventListener('resize', updateLogoContrast)
+      observer.disconnect()
+      window.removeEventListener('resize', observeLogoBackground)
     }
   }, [])
 
