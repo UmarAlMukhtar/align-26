@@ -29,6 +29,12 @@
   gap: 12px;
 }
 
+.registrationButton {
+  min-height: 44px;
+  gap: 8px;
+  font-weight: 600;
+}
+
 main .sectionTitle {
   font-size: clamp(2rem, 5vw, 3.75rem);
   font-weight: 400;

@@ -7,6 +7,7 @@ import './footer.css'
 import './motion.css'
 
 const ease = [0.16, 1, 0.3, 1]
+const localRegistration = import.meta.env.DEV
 const reveal = { initial: { opacity: 0, y: 28, filter: 'blur(8px)' }, whileInView: { opacity: 1, y: 0, filter: 'blur(0px)' }, viewport: { once: true, amount: 0.18 }, transition: { duration: .85, ease } }
 const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=LBS+College+of+Engineering%2C+Povval%2C+Kasaragod%2C+Kerala+671542'
 const mapsEmbedUrl = 'https://www.openstreetmap.org/export/embed.html?bbox=75.073%2C12.499%2C75.088%2C12.508&layer=mapnik&marker=12.50358%2C75.08078'
@@ -127,6 +128,19 @@ function App() {
         )}
       </AnimatePresence>
 
+      {localRegistration && (
+        <>
+          <link rel="preconnect" href="https://embed.lu.ma" />
+          <link rel="preconnect" href="https://luma.com" />
+          <script
+            id="luma-checkout"
+            src="https://embed.lu.ma/checkout-button.js"
+            async
+            onLoad={() => window.luma?.initCheckout()}
+          />
+        </>
+      )}
+
       <main>
         <section className="hero" id="top">
           <motion.div className="videoWrap" initial={{opacity:0, scale:1.05}} animate={{opacity:1, scale:1}} transition={{duration:1.8, ease}}>
@@ -141,8 +155,18 @@ function App() {
                 <p className="heroDescription">IEEE IAS Industry–Academia Connect</p>
                 <p className="eventDate"><time dateTime="2026-12-18">Friday, 18 December 2026</time> · LBS College of Engineering, Kasaragod</p>
                 <div className="buttons">
-                  <a className="btn primary" href="#program">View the program</a>
-                  <span className="registrationStatus">Registration hasn’t opened yet.</span>
+                  {localRegistration ? (
+                    <a
+                      className="btn primary registrationButton"
+                      href="https://luma.com/event/evt-IoNI4f9zYe4N9zd"
+                      data-luma-action="checkout"
+                      data-luma-event-id="evt-IoNI4f9zYe4N9zd"
+                    >
+                      Register for ALIGN ’26 <ArrowUpRight size={16} aria-hidden="true" />
+                    </a>
+                  ) : null}
+                  <a className={localRegistration ? 'btn secondary' : 'btn primary'} href="#program">View the program</a>
+                  {!localRegistration && <span className="registrationStatus">Registration hasn’t opened yet.</span>}
                 </div>
               </div>
             </div>
